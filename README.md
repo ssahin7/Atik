@@ -1,0 +1,2 @@
+# Atik
+endüstriyel simbiyoz
