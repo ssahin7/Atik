@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Atık Simbiyoz Platformu</title>
+    <script src="/static/script.js"></script>
+
+    <!-- FontAwesome (Simgeler için) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        /* Navbar */
+        #navbar {
+            width: 100%;
+            height: 60px;
+            background: #b2cca6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        #logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        #nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-right:30px;
+        }
+        .nav-btn {
+            padding: 8px 15px;
+            background: rgb(249, 249, 249);
+            border: 1px solid #5c0000;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover {
+            background: #014d1a;
+            color: white;
+        }
+        /* Arka Plan Blur */
+        #blur-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 5;
+        }
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgb(207, 243, 180);
+            padding: 40px;
+            border-radius: 40px;
+            z-index: 50;
+            width: 350px;
+            display: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .modal input, .modal select {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Başlangıcı -->
+    <div id="navbar">
+        <div id="logo">♻️ Atık Simbiyoz</div>
+        <div id="nav-buttons">
+            <button class="nav-btn" onclick="openModal('login')">
+                <i class="fas fa-sign-in-alt"></i> Giriş Yap
+            </button>
+            <button class="nav-btn" onclick="openModal('register')">
+                <i class="fas fa-user-plus"></i> Üye Ol
+            </button>
+            <button id="profile-btn" class="nav-btn" style="display: none;"onclick="openModal('profile')">
+                <i class="fas fa-user-circle"></i> Profil
+            </button>
+            <button id="companies-btn" class="nav-btn" onclick="openCompanyList()">
+                <i class="fas fa-building"></i> İşletmeler
+            </button>
+        </div>
+    </div>
+
+    <!-- Sayfa İçeriği -->
+    <h1 style="text-align: center; margin-top: 100px;">♻️ Endüstriyel Simbiyoz Platformu</h1>
+
+    <div style="text-align: center;">
+        <input type="text" id="waste_input" placeholder="Atık türü veya kodu girin">
+        <button onclick="searchWaste()">Ara</button>
+    </div>
+
+    <div id="result" style="text-align: center; margin-top: 20px;"></div>
+
+    <!-- Arka plan bulanıklığı -->
+    <div id="blur-background" onclick="closeModal()"></div>
+
+    <!-- Giriş Yap Modal -->
+    <div class="modal" id="login-modal">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h3>Giriş Yap</h3>
+        <input type="text" id="login-username" placeholder="Kullanıcı Adı">
+        <input type="password" id="login-password" placeholder="Şifre">
+        <button onclick="login()">Giriş</button>
+    </div>
+
+    <!-- Üye Ol Modal -->
+    <div class="modal" id="register-modal">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h3>Üye Ol</h3>
+        <input type="text" id="register-username" placeholder="Kullanıcı Adı">
+        <input type="password" id="register-password" placeholder="Şifre">
+        <input type="password" id="register-password2" placeholder="Şifre Tekrar">
+        <input type="text" id="register-company" placeholder="İşletme Adı">
+        <input type="email" id="register-email" placeholder="E-posta">
+        <input type="tel" id="register-phone" placeholder="Telefon Numarası">
+        <input type="text" id="register-address" placeholder="İşletme Adresi">
+        <button onclick = "register()">Kayıt Ol</button>
+    </div>
+    
+    <!-- Profil Modal -->
+<div class="modal" id="profile-modal" style="display: none;">
+    <span class="close-btn" onclick="closeModal()">×</span>
+    <h3>Profilim</h3>
+
+    <input type="text" id="profile-company" placeholder="İşletme Adı">
+    <input type="email" id="profile-email" placeholder="E-posta">
+    <input type="tel" id="profile-phone" placeholder="Telefon">
+    <input type="text" id="profile-address" placeholder="Adres">
+    <input type="text" id="profile-tax-no" placeholder="Vergi Numarası">
+    <input type="text" id="profile-sicil-no" placeholder="Ticaret Sicil No">
+    <input type="text" id="profile-web" placeholder="Şirket Web Sitesi">
+    <input type="email" id="profile-earsiv" placeholder="E-Arşiv Fatura Mail">
+    <input type="text" id="profile-nace" placeholder="Şirket Açıklaması(NACE)">
+
+
+    <button onclick="updateProfile()">Profili Güncelle</button>
+</div>
+
+<div id="profile-panel" style="display: none; max-width: 500px; margin: auto; padding: 30px; background: #e3f9db; border-radius: 20px;">
+  <h3 style="text-align: center;">Profil Bilgileriniz</h3>
+
+  <input type="text" id="profile-company" placeholder="İşletme Adı">
+  <input type="email" id="profile-email" placeholder="E-posta">
+  <input type="tel" id="profile-phone" placeholder="Telefon">
+  <input type="text" id="profile-address" placeholder="Adres">
+  <input type="text" id="profile-tax-no" placeholder="Vergi Numarası">
+  <input type="text" id="profile-tax-office" placeholder="Vergi Dairesi">
+  <input type="text" id="profile-waste-address" placeholder="Atık Alım Adresi">
+
+  <button onclick="updateProfile()">Profili Güncelle</button>
+</div>
+
+<div style="text-align: center; margin-top: 20px;">
+    <button onclick="tahminEt()">Firma Önerisi Al</button>
+
+</div>
+    
+</body>
+</html>
